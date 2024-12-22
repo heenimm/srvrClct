@@ -34,10 +34,15 @@ func operation(a, b float64, op rune) (float64, error) {
 	return 0, fmt.Errorf("invalid operation")
 }
 
-func Calc(expression string) (float64, error) {
+func Calculate(expression string) (float64, error) {
 	var values []float64
 	var ops []rune
 	i := 0
+
+	// Возвращаем ошибку 500
+	if !strings.ContainsAny(expression, "-*/+") {
+		return 0, ErrInternalError
+	}
 
 	for i < len(expression) {
 		char := expression[i]
