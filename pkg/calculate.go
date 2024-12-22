@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"unicode"
@@ -27,11 +26,11 @@ func operation(a, b float64, op rune) (float64, error) {
 		return a * b, nil
 	case '/':
 		if b == 0 {
-			return 0, fmt.Errorf("division by zero")
+			return 0, ErrDivisionByZero
 		}
 		return a / b, nil
 	}
-	return 0, fmt.Errorf("invalid operation")
+	return 0, ErrInvalidOperation
 }
 
 func Calculate(expression string) (float64, error) {
@@ -60,7 +59,7 @@ func Calculate(expression string) (float64, error) {
 			}
 			value, err := strconv.ParseFloat(sb.String(), 64)
 			if err != nil {
-				return 0, fmt.Errorf("invalid number")
+				return 0, ErrInvalidNumber
 			}
 			values = append(values, value)
 			continue
@@ -71,7 +70,7 @@ func Calculate(expression string) (float64, error) {
 		} else if char == ')' {
 			for len(ops) > 0 && ops[len(ops)-1] != '(' {
 				if len(values) < 2 {
-					return 0, fmt.Errorf("insufficient operands")
+					return 0, ErrInsufficientOperands
 				}
 				op := ops[len(ops)-1]
 				ops = ops[:len(ops)-1]
@@ -88,13 +87,13 @@ func Calculate(expression string) (float64, error) {
 			}
 
 			if len(ops) == 0 {
-				return 0, fmt.Errorf("mismatched parentheses")
+				return 0, ErrMismatchedParentheses
 			}
 			ops = ops[:len(ops)-1] // если слайс с операторами не пустой удаляем  открывающую скобку
 		} else { // если это не скобка но оператор уже есть и приоритет у оператора который в слайсе выше чем у того который новый был считан
 			for len(ops) > 0 && precedence(ops[len(ops)-1]) >= precedence(rune(char)) {
 				if len(values) < 2 {
-					return 0, fmt.Errorf("insufficient operands")
+					return 0, ErrInsufficientOperands
 				}
 				op := ops[len(ops)-1]
 				ops = ops[:len(ops)-1]
@@ -117,7 +116,7 @@ func Calculate(expression string) (float64, error) {
 
 	for len(ops) > 0 {
 		if len(values) < 2 {
-			return 0, fmt.Errorf("insufficient operands")
+			return 0, ErrInsufficientOperands
 		}
 		op := ops[len(ops)-1]
 		ops = ops[:len(ops)-1]
@@ -135,7 +134,7 @@ func Calculate(expression string) (float64, error) {
 	}
 
 	if len(values) != 1 {
-		return 0, fmt.Errorf("invalid expression")
+		return 0, ErrInvalidExpression
 	}
 	return values[0], nil
 }

@@ -42,9 +42,7 @@ curl --location 'http://localhost:8082/api/v1/calculate' --header 'Content-Type:
 
 * #### 500 Internal Server Error // когда введен текст
 
-curl --location 'http://localhost:8082/api/v1/calculate' 
---header 'Content-Type: application/json' 
---data '{ "expression": "test" }'
+curl --location 'http://localhost:8082/api/v1/calculate' --header 'Content-Type: application/json' --data '{ "expression": "test" }'
 
 | 200 Success  | 422 Unprocessable Entity            | 500 Internal Server Error         |
 | ------------ | ----------------------------------- | --------------------------------- |
