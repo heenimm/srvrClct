@@ -2,8 +2,6 @@ package internal
 
 import (
 	"bufio"
-	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -56,56 +54,7 @@ func (a *Application) Run() error {
 	return nil
 }
 
-type CalculationRequest struct {
-	Expression string `json:"expression"`
-}
-
-type CalculationResponse struct {
-	Result *float64 `json:"result,omitempty"`
-	Error  string   `json:"error,omitempty"`
-}
-
-func CalculateHandler(w http.ResponseWriter, r *http.Request) {
-	var response CalculationResponse
-
-	if r.Method != http.MethodPost {
-		http.Error(w, "method  must be POST 'http://localhost:8082/api/v1/calculate'", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var request CalculationRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		http.Error(w, `{"error": Expression is not valid}`, http.StatusUnprocessableEntity)
-		return
-	}
-
-	result, err := pkg.Calculate(request.Expression)
-
-	if err != nil && errors.Is(err, pkg.ErrInternalError) {
-		http.Error(w, `{"error":"Internal server error"}`, http.StatusInternalServerError)
-		return
-	}
-
-	if err != nil {
-		response.Error = "Expression is not valid"
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		err = json.NewEncoder(w).Encode(response)
-		if err != nil {
-			panic(err)
-		}
-		return
-	}
-
-	response.Result = &result
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(response)
-	if err != nil {
-		log.Panicln("Error encoding response:", err)
-	}
-}
-
 func (a *Application) RunServer() error {
-	// Создаём обработчик для маршрута "/calculate"
 	http.HandleFunc("/api/v1/calculate", CalculateHandler)
 	if err := http.ListenAndServe(":"+a.config.AddressOfPort, nil); err != nil {
 		return pkg.FailedToStartServer

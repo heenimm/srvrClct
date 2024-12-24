@@ -14,25 +14,21 @@ func TestCalculateHandler_Success(t *testing.T) {
 	// arrange //
 	////////////
 
-	// Создаем запрос с корректным телом
 	reqBody := `{"expression": "2+2*2"}`
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculate", bytes.NewBufferString(reqBody))
 	req.Header.Set("Content-Type", "application/json")
 
-	// Создаем ResponseRecorder для захвата ответа
 	rec := httptest.NewRecorder()
 
 	// act //
 	/////////
 
-	// Вызываем реальный обработчик
 	handler := http.HandlerFunc(internal.CalculateHandler)
 	handler.ServeHTTP(rec, req)
 
 	// assert //
 	////////////
 
-	// Проверяем ответ
 	res := rec.Result()
 	defer res.Body.Close()
 

@@ -89,8 +89,8 @@ func Calculate(expression string) (float64, error) {
 			if len(ops) == 0 {
 				return 0, ErrMismatchedParentheses
 			}
-			ops = ops[:len(ops)-1] // если слайс с операторами не пустой удаляем  открывающую скобку
-		} else { // если это не скобка но оператор уже есть и приоритет у оператора который в слайсе выше чем у того который новый был считан
+			ops = ops[:len(ops)-1]
+		} else {
 			for len(ops) > 0 && precedence(ops[len(ops)-1]) >= precedence(rune(char)) {
 				if len(values) < 2 {
 					return 0, ErrInsufficientOperands
