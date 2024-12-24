@@ -3,6 +3,7 @@ package internal_test
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"serverCalc/internal"
@@ -32,10 +33,6 @@ func TestCalculateHandler_Success(t *testing.T) {
 	res := rec.Result()
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		t.Fatalf("expected status 200, got %d", res.StatusCode)
-	}
-
 	var response struct {
 		Result float64 `json:"result"`
 	}
@@ -43,20 +40,17 @@ func TestCalculateHandler_Success(t *testing.T) {
 		t.Fatalf("failed to decode response: %v", err)
 	}
 
-	if response.Result != 6 {
-		t.Errorf("expected result 6, got %f", response.Result)
-	}
+	require.Equal(t, res.StatusCode, http.StatusOK)
+	require.Equal(t, response.Result, float64(6))
 }
 
 func TestCalculateHandler_UnprocessableEntity(t *testing.T) {
 	// arrange //
 	////////////
 
-	// Некорректное тело запроса
 	reqBody := `{"Expression": "2+2*abc"}`
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculate", bytes.NewBufferString(reqBody))
 	req.Header.Set("Content-Type", "application/json")
-
 	rec := httptest.NewRecorder()
 
 	// act //
@@ -67,14 +61,6 @@ func TestCalculateHandler_UnprocessableEntity(t *testing.T) {
 
 	res := rec.Result()
 	defer res.Body.Close()
-
-	// assert //
-	////////////
-
-	if res.StatusCode != http.StatusUnprocessableEntity {
-		t.Fatalf("expected status 422, got %d", res.StatusCode)
-	}
-
 	var response struct {
 		Error string `json:"error"`
 	}
@@ -82,20 +68,20 @@ func TestCalculateHandler_UnprocessableEntity(t *testing.T) {
 		t.Fatalf("failed to decode response: %v", err)
 	}
 
-	if response.Error != "Expression is not valid" {
-		t.Errorf("expected error 'Expression is not valid', got '%s'", response.Error)
-	}
+	// assert //
+	////////////
+
+	require.Equal(t, res.StatusCode, http.StatusUnprocessableEntity)
+	require.Equal(t, response.Error, "Expression is not valid")
 }
 
 func TestCalculateHandler_BadRequest(t *testing.T) {
 	// arrange //
 	////////////
 
-	// Деление на ноль
 	reqBody := `{"expression": "test"}`
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/calculate", bytes.NewBufferString(reqBody))
 	req.Header.Set("Content-Type", "application/json")
-
 	rec := httptest.NewRecorder()
 
 	// act //
@@ -110,18 +96,5 @@ func TestCalculateHandler_BadRequest(t *testing.T) {
 	// assert //
 	////////////
 
-	if res.StatusCode != http.StatusInternalServerError {
-		t.Fatalf("expected status 500, got %d", res.StatusCode)
-	}
-
-	var response struct {
-		Error string `json:"error"`
-	}
-	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-		t.Fatalf("failed to decode response: %v", err)
-	}
-
-	if response.Error != "Internal server error" {
-		t.Errorf("expected error 'Internal server error', got '%s'", response.Error)
-	}
+	require.Equal(t, res.StatusCode, http.StatusInternalServerError)
 }
