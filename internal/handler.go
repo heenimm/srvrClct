@@ -29,6 +29,10 @@ func CalculateHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil && errors.Is(err, pkg.ErrInternalError) {
 		response.Error = "Internal server error"
 		w.WriteHeader(http.StatusInternalServerError)
+		err = json.NewEncoder(w).Encode(response)
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 
