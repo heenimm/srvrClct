@@ -50,7 +50,5 @@ func worker(wg *sync.WaitGroup, orchestratorURL string) {
 			continue
 		}
 		resp.Body.Close()
-
-		fmt.Printf("Результат задачи %s отправлен: %f\n", task.ID, result)
 	}
 }

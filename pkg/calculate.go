@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"github.com/google/uuid"
+	"math/rand"
 	"strconv"
 	"strings"
 	"sync"
@@ -11,6 +12,7 @@ import (
 
 var (
 	mutex  = sync.Mutex{}
+	tasks  []TaskRequest
 	taskID string
 )
 
@@ -22,20 +24,22 @@ const (
 )
 
 func GenerateTask() {
-	//operations := []string{"+", "-", "*", "/"}
+	operations := []string{"+", "-", "*", "/"}
 	mutex.Lock()
 	defer mutex.Unlock()
 
 	taskID = uuid.New().String()
-	//oper := operations[rand.Intn(len(operations))]
-	// TaskRequest{
-	//	ID:            taskID,
-	//	Arg1:          strconv.Itoa(rand.Intn(99)),
-	//	Arg2:          strconv.Itoa(rand.Intn(99)),
-	//	Operation:     oper,
-	//	OperationTime: getOperationTime(oper),
-	//}
+	oper := operations[rand.Intn(len(operations))]
 
+	task := TaskRequest{
+		ID:            taskID,
+		Arg1:          strconv.Itoa(rand.Intn(99)),
+		Arg2:          strconv.Itoa(rand.Intn(99)),
+		Operation:     oper,
+		OperationTime: getOperationTime(oper),
+	}
+
+	tasks = append(tasks, task)
 }
 
 func getOperationTime(operation string) int {
