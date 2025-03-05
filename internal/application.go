@@ -55,8 +55,15 @@ func (a *Application) Run() error {
 }
 
 func (a *Application) RunServer() error {
-	http.HandleFunc("/api/v1/calculate", CalculateHandler)
-	if err := http.ListenAndServe(":"+a.config.AddressOfPort, nil); err != nil {
+	go pkg.GenerateTask()
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/v1/calculate", AddExpressionHandler)
+	mux.HandleFunc("/api/v1/expressions", GetExpressionsHandler)
+	mux.HandleFunc("/api/v1/expressions/", GetExpressionByIDHandler)
+	mux.HandleFunc("/api/v1/internal/task", GetTasksHandler)
+
+	if err := http.ListenAndServe(":"+a.config.AddressOfPort, mux); err != nil {
 		return pkg.FailedToStartServer
 	}
 	return nil

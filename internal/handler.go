@@ -3,16 +3,25 @@ package internal
 import (
 	"encoding/json"
 	"errors"
+	"github.com/google/uuid"
 	"log"
 	"net/http"
 	"serverCalc/pkg"
+	"serverCalc/pkg/store"
+	"strings"
+	"sync"
+)
+
+var (
+	expressionStore = make(map[string]string)
+	mutex           sync.Mutex
 )
 
 func CalculateHandler(w http.ResponseWriter, r *http.Request) {
 	var response pkg.CalculationResponse
 
 	if r.Method != http.MethodPost {
-		response.Error = "method  must be POST 'http://localhost:8082/api/v1/calculate'"
+		response.Error = "метод должен быть POST"
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
@@ -25,7 +34,6 @@ func CalculateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result, err := pkg.Calculate(request.Expression)
-
 	if err != nil && errors.Is(err, pkg.ErrInternalError) {
 		response.Error = "Internal server error"
 		w.WriteHeader(http.StatusInternalServerError)
@@ -47,9 +55,85 @@ func CalculateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Result = &result
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
-		log.Panicln("Error encoding response:", err)
+		log.Println("Error encoding response:", err)
 	}
+}
+
+func AddExpressionHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "метод должен быть POST", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var request pkg.CalculationRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil || request.Expression == "" {
+		http.Error(w, "неверный запрос", http.StatusUnprocessableEntity)
+		return
+	}
+
+	id := uuid.New().String()
+
+	mutex.Lock()
+	expressionStore[id] = request.Expression
+	store.AddExpression(id, request.Expression)
+	mutex.Unlock()
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(pkg.CalculationResponse{ID: id})
+}
+
+func GetExpressionsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "метод должен быть GET", http.StatusMethodNotAllowed)
+		return
+	}
+
+	expressions, err := store.GetExpressions()
+	if err != nil {
+		http.Error(w, "неверный запрос", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"expressions": expressions,
+	})
+}
+
+func GetTasksHandler(w http.ResponseWriter, r *http.Request) {
+	var response pkg.CalculationResponse
+
+	if r.Method != http.MethodGet {
+		response.Error = "метод должен быть GET"
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+}
+
+func GetExpressionByIDHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "что-то пошло не так, метод должен быть GET", http.StatusMethodNotAllowed)
+		return
+	}
+
+	vars := strings.Split(r.URL.Path, "/")
+	if len(vars) < 5 || vars[4] == "" {
+		http.Error(w, "с таким ID нет записей", http.StatusBadRequest)
+		return
+	}
+	id := vars[4][1:]
+	expression, err := store.GetExpressionByID(id)
+	if err != nil {
+		http.Error(w, "нет такого выражения", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(expression)
 }
