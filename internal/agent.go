@@ -6,24 +6,23 @@ import (
 	"fmt"
 	"net/http"
 	"serverCalc/pkg"
-	"sync"
 	"time"
 )
 
-func worker(wg *sync.WaitGroup, orchestratorURL string) {
-	defer wg.Done()
+func worker(orchestratorURL string) {
+	//defer wg.Done()
 
 	for {
 		resp, err := http.Get(orchestratorURL + "/internal/task")
 		if err != nil {
 			fmt.Println("Ошибка запроса задачи:", err)
-			time.Sleep(2 * time.Second)
+			time.Sleep(5 * time.Second)
 			continue
 		}
 
 		if resp.StatusCode != http.StatusOK {
 			fmt.Println("Нет задач...")
-			time.Sleep(2 * time.Second)
+			time.Sleep(5 * time.Second)
 			continue
 		}
 

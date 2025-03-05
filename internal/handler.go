@@ -14,6 +14,8 @@ import (
 
 var (
 	expressionStore = make(map[string]string)
+	taskQueue       []pkg.CalculationRequest
+	taskResult      = make(map[string]float64)
 	mutex           sync.Mutex
 )
 
@@ -105,17 +107,6 @@ func GetExpressionsHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func GetTasksHandler(w http.ResponseWriter, r *http.Request) {
-	var response pkg.CalculationResponse
-
-	if r.Method != http.MethodGet {
-		response.Error = "метод должен быть GET"
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-}
-
 func GetExpressionByIDHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "что-то пошло не так, метод должен быть GET", http.StatusMethodNotAllowed)
@@ -136,4 +127,58 @@ func GetExpressionByIDHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(expression)
+}
+
+func InternalTaskHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		getTaskHandler(w, r)
+	case http.MethodPost:
+		postTaskResultHandler(w, r)
+	default:
+		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+	}
+}
+
+func getTaskHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "метод должен быть GET", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if len(taskQueue) == 0 {
+		http.Error(w, "нет задачи", http.StatusNotFound)
+		return
+	}
+
+	task := taskQueue[0]
+	taskQueue = taskQueue[1:]
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"task": task,
+	})
+}
+
+func postTaskResultHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "метод должен быть POST", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var result pkg.TaskResponse
+	if err := json.NewDecoder(r.Body).Decode(&result); err != nil {
+		http.Error(w, "невалидные данные", http.StatusUnprocessableEntity)
+		log.Print(err)
+		return
+	}
+
+	if _, exists := taskResult[result.ID]; !exists {
+		http.Error(w, "нет такой задачи", http.StatusNotFound)
+		return
+	}
+	taskResult[result.ID] = result.Result
+
+	w.WriteHeader(http.StatusOK)
 }

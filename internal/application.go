@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"serverCalc/pkg"
+	"strconv"
 	"strings"
 )
 
@@ -55,16 +56,26 @@ func (a *Application) Run() error {
 }
 
 func (a *Application) RunServer() error {
+	computingPowerStr := os.Getenv("COMPUTING_POWER")
+	computingPower, err := strconv.Atoi(computingPowerStr)
+	if err != nil || computingPower <= 0 {
+		computingPower = 1
+	}
+
 	go pkg.GenerateTask()
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/v1/calculate", AddExpressionHandler)
 	mux.HandleFunc("/api/v1/expressions", GetExpressionsHandler)
 	mux.HandleFunc("/api/v1/expressions/", GetExpressionByIDHandler)
-	mux.HandleFunc("/api/v1/internal/task", GetTasksHandler)
+	mux.HandleFunc("/internal/task", InternalTaskHandler)
 
 	if err := http.ListenAndServe(":"+a.config.AddressOfPort, mux); err != nil {
 		return pkg.FailedToStartServer
+	}
+
+	for i := 0; i < computingPower; i++ {
+		go worker("http://localhost:" + a.config.AddressOfPort)
 	}
 	return nil
 }

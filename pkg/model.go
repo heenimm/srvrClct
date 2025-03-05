@@ -1,7 +1,7 @@
 package pkg
 
 type CalculationRequest struct {
-	ID         int    `json:"id"`
+	ID         string `json:"id"`
 	Expression string `json:"expression"`
 }
 
@@ -28,6 +28,6 @@ type TaskRequest struct {
 }
 
 type TaskResponse struct {
-	ID     int     `json:"id"`
+	ID     string  `json:"id"`
 	Result float64 `json:"result"`
 }
