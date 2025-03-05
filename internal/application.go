@@ -8,6 +8,7 @@ import (
 	"serverCalc/pkg"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 type Config struct {
@@ -56,6 +57,8 @@ func (a *Application) Run() error {
 }
 
 func (a *Application) RunServer() error {
+	var wg sync.WaitGroup
+
 	computingPowerStr := os.Getenv("COMPUTING_POWER")
 	computingPower, err := strconv.Atoi(computingPowerStr)
 	if err != nil || computingPower <= 0 {
@@ -63,7 +66,6 @@ func (a *Application) RunServer() error {
 	}
 
 	go pkg.GenerateTask()
-
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/v1/calculate", AddExpressionHandler)
 	mux.HandleFunc("/api/v1/expressions", GetExpressionsHandler)
@@ -75,7 +77,13 @@ func (a *Application) RunServer() error {
 	}
 
 	for i := 0; i < computingPower; i++ {
-		go worker("http://localhost:" + a.config.AddressOfPort)
+		wg.Add(1)
+		go worker(&wg, "http://localhost:"+a.config.AddressOfPort)
 	}
+
+	go func() {
+		wg.Wait()
+	}()
+
 	return nil
 }

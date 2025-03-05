@@ -11,32 +11,25 @@ import (
 
 var (
 	expressions = make(map[string]pkg.ExpressionResponse)
+	tasks       = make(map[string]pkg.TaskResponse)
 	mutex       = sync.Mutex{}
-	path        = "expressions.json"
 )
-
-func init() {
-	if err := loadFromFile(); err != nil {
-		log.Println("Ошибка загрузки данных из файла:", err)
-	}
-}
 
 func AddExpression(id, exp string) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
 	expressions[id] = pkg.ExpressionResponse{
-		ID:     id,
-		Status: "success",
-		Result: exp,
+		ID:          id,
+		Status:      "success",
+		Expressions: exp,
 	}
-	log.Println("success при сохранении JSON:")
-
-	return saveToFile()
+	log.Println("Задача успешно сохранена")
+	return saveExpToFile()
 }
 
 func GetExpressions() ([]pkg.ExpressionResponse, error) {
-	if err := loadFromFile(); err != nil {
+	if err := loadFromFile("expressions.json"); err != nil {
 		log.Println(err)
 		return nil, err
 	}
@@ -64,8 +57,78 @@ func GetExpressionByID(id string) (pkg.ExpressionResponse, error) {
 	return pkg.ExpressionResponse{}, errors.New("expression not found")
 }
 
-func saveToFile() error {
-	file, err := os.Create(path)
+func AddTask(id, arg1, arg2, operation string) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	tasks[id] = pkg.TaskResponse{
+		ID: id,
+		//Arg1:      arg1,
+		//Arg2:      arg2,
+		//Operation: operation,
+	}
+
+	return saveTasksToFile()
+}
+
+func GetTasks() ([]pkg.TaskResponse, error) {
+	if err := loadTasksFromFile("tasks.json"); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	mutex.Lock()
+	defer mutex.Unlock()
+	tasksList := make([]pkg.TaskResponse, 0, len(tasks))
+	for _, task := range tasks {
+		tasksList = append(tasksList, task)
+	}
+
+	return tasksList, nil
+}
+
+func GetLastTask() (pkg.TaskResponse, error) {
+	if len(tasks) == 0 {
+		return pkg.TaskResponse{}, errors.New("нет сохраненных задач")
+	}
+
+	var lastTask pkg.TaskResponse
+	for _, task := range tasks {
+		lastTask = task
+	}
+
+	return lastTask, nil
+}
+
+func saveTasksToFile() error {
+	file, err := os.Create("tasks.json")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	log.Println("Ошибка при кодировании JSON:", err)
+	return encoder.Encode(tasks)
+}
+
+func loadTasksFromFile(path string) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	return decoder.Decode(&tasks)
+}
+
+func saveExpToFile() error {
+	file, err := os.Create("expressions.json")
 	if err != nil {
 		return err
 	}
@@ -76,7 +139,7 @@ func saveToFile() error {
 	return encoder.Encode(expressions)
 }
 
-func loadFromFile() error {
+func loadFromFile(path string) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 

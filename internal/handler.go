@@ -15,7 +15,6 @@ import (
 var (
 	expressionStore = make(map[string]string)
 	taskQueue       []pkg.CalculationRequest
-	taskResult      = make(map[string]float64)
 	mutex           sync.Mutex
 )
 
@@ -151,8 +150,10 @@ func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task := taskQueue[0]
-	taskQueue = taskQueue[1:]
+	task, err := store.GetTasks()
+	if err != nil {
+		log.Println(err)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -174,11 +175,10 @@ func postTaskResultHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, exists := taskResult[result.ID]; !exists {
+	if _, exists := expressionStore[result.ID]; !exists {
 		http.Error(w, "нет такой задачи", http.StatusNotFound)
 		return
 	}
-	taskResult[result.ID] = result.Result
 
 	w.WriteHeader(http.StatusOK)
 }

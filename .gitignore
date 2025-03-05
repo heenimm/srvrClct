@@ -1,0 +1,5 @@
+# Idea cache
+.idea/
+
+# GO binaries
+bin/

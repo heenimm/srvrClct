@@ -14,9 +14,9 @@ type CalculationResponse struct {
 type ExpressionRequest struct{}
 
 type ExpressionResponse struct {
-	ID     string `json:"id"`
-	Status string `json:"status"`
-	Result string `json:"result,omitempty"`
+	ID          string `json:"id"`
+	Status      string `json:"status"`
+	Expressions string `json:"result,omitempty"`
 }
 
 type TaskRequest struct {
