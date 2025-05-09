@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "/proto";
+
+package calc;
+
+service TaskService {
+  rpc Calculate (TaskRequest) returns (TaskResult);
+}
+
+message TaskRequest {
+  string expression = 1;
+}
+
+message TaskResult {
+  string result = 1;
+  string error = 2;
+}
