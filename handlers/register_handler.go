@@ -24,14 +24,12 @@ func RegisterHandler(db *sqlx.DB) http.HandlerFunc {
 			return
 		}
 
-		// Хешируем пароль
 		hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
 			http.Error(w, "error hashing password", http.StatusInternalServerError)
 			return
 		}
 
-		// Пишем в БД
 		_, err = db.Exec("INSERT INTO users (login, password_hash) VALUES (?, ?)", req.Login, string(hash))
 		if err != nil {
 			http.Error(w, "user already exists or db error", http.StatusBadRequest)

@@ -8,13 +8,14 @@ import (
 )
 
 func main() {
-	app := application.NewApplication()
-	grpc.StartGRPCServer()
-	app.RunServer()
-
 	db, err := storage.InitDB("calc.db")
 	if err != nil {
 		log.Fatalf("failed to init db: %v", err)
 	}
 	defer db.Close()
+
+	app := application.NewApplication(db)
+	app.RunServer()
+	grpc.StartGRPCServer()
+
 }

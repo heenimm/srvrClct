@@ -6,17 +6,16 @@ import (
 	"os"
 )
 
-var DB *sqlx.DB
+//var DB *sqlx.DB
 
 func InitDB(dbPath string) (*sqlx.DB, error) {
-	var err error
-	DB, err = sqlx.Connect("sqlite3", dbPath)
+	db, err := sqlx.Connect("sqlite3", dbPath)
 	if err != nil {
 		log.Printf("error connecting to database: %v", err)
 		return nil, err
 	}
 
-	return DB, nil
+	return db, nil
 }
 
 func ApplySchema(db *sqlx.DB, schemaPath string) error {

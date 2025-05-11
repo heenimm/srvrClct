@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/jmoiron/sqlx"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/jmoiron/sqlx"
-	"serverCalc/auth"
 )
 
 var jwtSecret = []byte("your_secret_key")
@@ -19,20 +19,25 @@ type LoginRequest struct {
 
 func LoginHandler(db *sqlx.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if db == nil {
+			http.Error(w, "Database not initialized", http.StatusInternalServerError)
+			return
+		}
+
 		var req LoginRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "invalid request", http.StatusBadRequest)
 			return
 		}
 
-		var storedPassword string
-		err := db.Get(&storedPassword, "SELECT password FROM users WHERE login = ?", req.Login)
+		var hashedPassword string
+		err := db.Get(&hashedPassword, "SELECT password_hash FROM users WHERE login = ?", req.Login)
 		if err != nil {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		if err := auth.CheckPasswordHash(req.Password, storedPassword); err != nil {
+		if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(req.Password)); err != nil {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
@@ -49,9 +54,6 @@ func LoginHandler(db *sqlx.DB) http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{
-			"token": tokenString,
-		})
+		json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
 	}
 }

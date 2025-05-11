@@ -35,15 +35,30 @@ go mod download
 
 # API
 
-Сервис имеет три внешних хендлера:
+Перед использованием необходимо зарегистрироваться
+
+```
+curl -X POST http://localhost:8082/api/v1/register -H "Content-Type: application/json" -d '{"login":"tester","password":"secret123"}'
+```
+
+После залогиниться и получить свой токен
+
+```
+curl -X POST http://localhost:8082/api/v1/login -H "Content-Type: application/json" -d '{"login":"tester","password":"secret123"}'
+
+```
+
+## Все возможности сервиса доступны только зарегистрированным пользователям
+
+# Три внешних хендлера:
 
 * Добавление вычисления арифметического выражения
   ```
-  curl --location 'localhost:8082/api/v1/calculate' \
-  --header 'Content-Type: application/json' \
-  --data '{
-    "expression": <строка с выражение>
-  }'
+  curl -X POST http://localhost:8082/api/v1/calculate \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_jwt_token_here" \
+  -d '{"expression": "3 + 5"}'
+
   ```
 
 Коды ответа: 201 - выражение принято для вычисления, 422 - невалидные данные, 500 - что-то пошло не так
@@ -58,7 +73,9 @@ go mod download
 
 * Получение списка выражений
   ```
-  curl --location 'localhost:8082/api/v1/expressions'
+  curl --location 'localhost:8082/api/v1/expressions' \
+  -H "Authorization: Bearer your_jwt_token_here"
+
   ```
 
 Тело ответа
@@ -86,7 +103,9 @@ go mod download
 * 500 - что-то пошло не так
 * Получение выражения по его идентификатору
   ```
-  curl --location 'localhost:8082/api/v1/expressions/:id'
+  curl --location 'localhost:8082/api/v1/expressions/:id' \
+  -H "Authorization: Bearer your_jwt_token_here"
+
   ```
 
 Коды ответа:

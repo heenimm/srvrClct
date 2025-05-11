@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"os"
 	"serverCalc/handlers"
+	"serverCalc/middleware"
 	"serverCalc/pkg"
-	"serverCalc/storage"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type Config struct {
@@ -28,11 +30,13 @@ func ConfigFromEnv() *Config {
 
 type Application struct {
 	config *Config
+	db     *sqlx.DB
 }
 
-func NewApplication() *Application {
+func NewApplication(db *sqlx.DB) *Application {
 	return &Application{
 		config: ConfigFromEnv(),
+		db:     db,
 	}
 }
 
@@ -69,11 +73,12 @@ func (a *Application) RunServer() error {
 
 	go pkg.GenerateTask()
 	mux := http.NewServeMux()
-	mux.HandleFunc("/api/v1/calculate", AddExpressionHandler)
-	mux.HandleFunc("/api/v1/expressions", GetExpressionsHandler)
-	mux.HandleFunc("/api/v1/expressions/", GetExpressionByIDHandler)
-	http.HandleFunc("/api/v1/login", LoginHandler(storage.DB))
-	http.HandleFunc("/api/v1/register", handlers.RegisterHandler(storage.DB))
+	mux.Handle("/api/v1/calculate", middleware.JWTAuthMiddleware(http.HandlerFunc(AddExpressionHandler)))
+	mux.Handle("/api/v1/expressions", middleware.JWTAuthMiddleware(http.HandlerFunc(GetExpressionsHandler)))
+	mux.Handle("/api/v1/expressions/", middleware.JWTAuthMiddleware(http.HandlerFunc(GetExpressionByIDHandler)))
+
+	mux.HandleFunc("/api/v1/login", handlers.LoginHandler(a.db))
+	mux.HandleFunc("/api/v1/register", handlers.RegisterHandler(a.db))
 	mux.HandleFunc("/internal/task", InternalTaskHandler)
 
 	if err := http.ListenAndServe(":"+a.config.AddressOfPort, mux); err != nil {
