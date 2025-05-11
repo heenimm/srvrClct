@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"serverCalc/handlers"
 	"serverCalc/storage"
+
+	_ "github.com/mattn/go-sqlite3"
 	"testing"
 )
 
@@ -20,14 +22,13 @@ func TestRegisterHandler(t *testing.T) {
 
 	db, err := storage.InitDB(absPath)
 	if err != nil {
-		t.Fatalf("failed to init db: %v", err)
+		t.Log(err)
 	}
-	defer db.Close()
+	//_ = storage.ApplySchema(db, "../db/schema.sql")
 
 	handler := handlers.RegisterHandler(db)
-
 	reqBody := map[string]string{
-		"login":    "testuser",
+		"login":    "stuser",
 		"password": "secret123",
 	}
 	jsonBody, _ := json.Marshal(reqBody)

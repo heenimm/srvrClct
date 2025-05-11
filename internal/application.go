@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"serverCalc/handlers"
 	"serverCalc/pkg"
+	"serverCalc/storage"
 	"strconv"
 	"strings"
 	"sync"
@@ -70,6 +72,8 @@ func (a *Application) RunServer() error {
 	mux.HandleFunc("/api/v1/calculate", AddExpressionHandler)
 	mux.HandleFunc("/api/v1/expressions", GetExpressionsHandler)
 	mux.HandleFunc("/api/v1/expressions/", GetExpressionByIDHandler)
+	http.HandleFunc("/api/v1/login", LoginHandler(storage.DB))
+	http.HandleFunc("/api/v1/register", handlers.RegisterHandler(storage.DB))
 	mux.HandleFunc("/internal/task", InternalTaskHandler)
 
 	if err := http.ListenAndServe(":"+a.config.AddressOfPort, mux); err != nil {

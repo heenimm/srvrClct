@@ -4,19 +4,70 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 	"log"
 	"net/http"
+	"serverCalc/auth"
 	"serverCalc/pkg"
 	"serverCalc/pkg/store"
 	"strings"
 	"sync"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var (
 	expressionStore = make(map[string]string)
 	taskQueue       []pkg.CalculationRequest
 	mutex           sync.Mutex
+	jwtSecret       = []byte("your_secret_key")
 )
+
+type LoginRequest struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
+
+func LoginHandler(db *sqlx.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req LoginRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "invalid request", http.StatusBadRequest)
+			return
+		}
+
+		var storedPassword string
+		err := db.Get(&storedPassword, "SELECT password FROM users WHERE login = ?", req.Login)
+		if err != nil {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		if err := auth.CheckPasswordHash(req.Password, storedPassword); err != nil {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"login": req.Login,
+			"exp":   time.Now().Add(24 * time.Hour).Unix(),
+		})
+
+		tokenString, err := token.SignedString(jwtSecret)
+		if err != nil {
+			http.Error(w, "could not create token", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{
+			"token": tokenString,
+		})
+	}
+}
 
 func CalculateHandler(w http.ResponseWriter, r *http.Request) {
 	var response pkg.CalculationResponse
