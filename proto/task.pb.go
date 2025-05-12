@@ -21,28 +21,64 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type TaskRequest struct {
+type Empty struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Empty) Reset() {
+	*x = Empty{}
+	mi := &file_proto_task_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Empty) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Empty) ProtoMessage() {}
+
+func (x *Empty) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_task_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Empty.ProtoReflect.Descriptor instead.
+func (*Empty) Descriptor() ([]byte, []int) {
+	return file_proto_task_proto_rawDescGZIP(), []int{0}
+}
+
+type CalculationRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Expression    string                 `protobuf:"bytes,1,opt,name=expression,proto3" json:"expression,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TaskRequest) Reset() {
-	*x = TaskRequest{}
-	mi := &file_proto_task_proto_msgTypes[0]
+func (x *CalculationRequest) Reset() {
+	*x = CalculationRequest{}
+	mi := &file_proto_task_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *TaskRequest) String() string {
+func (x *CalculationRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*TaskRequest) ProtoMessage() {}
+func (*CalculationRequest) ProtoMessage() {}
 
-func (x *TaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_task_proto_msgTypes[0]
+func (x *CalculationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_task_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -53,41 +89,42 @@ func (x *TaskRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TaskRequest.ProtoReflect.Descriptor instead.
-func (*TaskRequest) Descriptor() ([]byte, []int) {
-	return file_proto_task_proto_rawDescGZIP(), []int{0}
+// Deprecated: Use CalculationRequest.ProtoReflect.Descriptor instead.
+func (*CalculationRequest) Descriptor() ([]byte, []int) {
+	return file_proto_task_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *TaskRequest) GetExpression() string {
+func (x *CalculationRequest) GetExpression() string {
 	if x != nil {
 		return x.Expression
 	}
 	return ""
 }
 
-type TaskResult struct {
+type CalculationResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Result        string                 `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
-	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Result        string                 `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"`
+	Error         string                 `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TaskResult) Reset() {
-	*x = TaskResult{}
-	mi := &file_proto_task_proto_msgTypes[1]
+func (x *CalculationResponse) Reset() {
+	*x = CalculationResponse{}
+	mi := &file_proto_task_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *TaskResult) String() string {
+func (x *CalculationResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*TaskResult) ProtoMessage() {}
+func (*CalculationResponse) ProtoMessage() {}
 
-func (x *TaskResult) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_task_proto_msgTypes[1]
+func (x *CalculationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_task_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -98,19 +135,330 @@ func (x *TaskResult) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TaskResult.ProtoReflect.Descriptor instead.
-func (*TaskResult) Descriptor() ([]byte, []int) {
-	return file_proto_task_proto_rawDescGZIP(), []int{1}
+// Deprecated: Use CalculationResponse.ProtoReflect.Descriptor instead.
+func (*CalculationResponse) Descriptor() ([]byte, []int) {
+	return file_proto_task_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *TaskResult) GetResult() string {
+func (x *CalculationResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CalculationResponse) GetResult() string {
 	if x != nil {
 		return x.Result
 	}
 	return ""
 }
 
-func (x *TaskResult) GetError() string {
+func (x *CalculationResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+type Expression struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Expression    string                 `protobuf:"bytes,2,opt,name=expression,proto3" json:"expression,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Expression) Reset() {
+	*x = Expression{}
+	mi := &file_proto_task_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Expression) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Expression) ProtoMessage() {}
+
+func (x *Expression) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_task_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Expression.ProtoReflect.Descriptor instead.
+func (*Expression) Descriptor() ([]byte, []int) {
+	return file_proto_task_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Expression) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Expression) GetExpression() string {
+	if x != nil {
+		return x.Expression
+	}
+	return ""
+}
+
+type GetByIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetByIDRequest) Reset() {
+	*x = GetByIDRequest{}
+	mi := &file_proto_task_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetByIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetByIDRequest) ProtoMessage() {}
+
+func (x *GetByIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_task_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetByIDRequest.ProtoReflect.Descriptor instead.
+func (*GetByIDRequest) Descriptor() ([]byte, []int) {
+	return file_proto_task_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetByIDRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type ExpressionListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Expressions   []*Expression          `protobuf:"bytes,1,rep,name=expressions,proto3" json:"expressions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExpressionListResponse) Reset() {
+	*x = ExpressionListResponse{}
+	mi := &file_proto_task_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExpressionListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExpressionListResponse) ProtoMessage() {}
+
+func (x *ExpressionListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_task_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExpressionListResponse.ProtoReflect.Descriptor instead.
+func (*ExpressionListResponse) Descriptor() ([]byte, []int) {
+	return file_proto_task_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ExpressionListResponse) GetExpressions() []*Expression {
+	if x != nil {
+		return x.Expressions
+	}
+	return nil
+}
+
+type TaskResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Expression    string                 `protobuf:"bytes,2,opt,name=expression,proto3" json:"expression,omitempty"`
+	Error         string                 `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TaskResponse) Reset() {
+	*x = TaskResponse{}
+	mi := &file_proto_task_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TaskResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskResponse) ProtoMessage() {}
+
+func (x *TaskResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_task_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskResponse.ProtoReflect.Descriptor instead.
+func (*TaskResponse) Descriptor() ([]byte, []int) {
+	return file_proto_task_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *TaskResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *TaskResponse) GetExpression() string {
+	if x != nil {
+		return x.Expression
+	}
+	return ""
+}
+
+func (x *TaskResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+type TaskResultRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Result        string                 `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TaskResultRequest) Reset() {
+	*x = TaskResultRequest{}
+	mi := &file_proto_task_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TaskResultRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskResultRequest) ProtoMessage() {}
+
+func (x *TaskResultRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_task_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskResultRequest.ProtoReflect.Descriptor instead.
+func (*TaskResultRequest) Descriptor() ([]byte, []int) {
+	return file_proto_task_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *TaskResultRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *TaskResultRequest) GetResult() string {
+	if x != nil {
+		return x.Result
+	}
+	return ""
+}
+
+type TaskSubmitResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TaskSubmitResponse) Reset() {
+	*x = TaskSubmitResponse{}
+	mi := &file_proto_task_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TaskSubmitResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskSubmitResponse) ProtoMessage() {}
+
+func (x *TaskSubmitResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_task_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskSubmitResponse.ProtoReflect.Descriptor instead.
+func (*TaskSubmitResponse) Descriptor() ([]byte, []int) {
+	return file_proto_task_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *TaskSubmitResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *TaskSubmitResponse) GetError() string {
 	if x != nil {
 		return x.Error
 	}
@@ -121,17 +469,45 @@ var File_proto_task_proto protoreflect.FileDescriptor
 
 const file_proto_task_proto_rawDesc = "" +
 	"\n" +
-	"\x10proto/task.proto\x12\x04calc\"-\n" +
-	"\vTaskRequest\x12\x1e\n" +
+	"\x10proto/task.proto\x12\x04calc\"\a\n" +
+	"\x05Empty\"4\n" +
+	"\x12CalculationRequest\x12\x1e\n" +
 	"\n" +
 	"expression\x18\x01 \x01(\tR\n" +
-	"expression\":\n" +
+	"expression\"S\n" +
+	"\x13CalculationResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
+	"\x06result\x18\x02 \x01(\tR\x06result\x12\x14\n" +
+	"\x05error\x18\x03 \x01(\tR\x05error\"<\n" +
 	"\n" +
-	"TaskResult\x12\x16\n" +
-	"\x06result\x18\x01 \x01(\tR\x06result\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05error2?\n" +
-	"\vTaskService\x120\n" +
-	"\tCalculate\x12\x11.calc.TaskRequest\x1a\x10.calc.TaskResultB\bZ\x06/protob\x06proto3"
+	"Expression\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
+	"\n" +
+	"expression\x18\x02 \x01(\tR\n" +
+	"expression\" \n" +
+	"\x0eGetByIDRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"L\n" +
+	"\x16ExpressionListResponse\x122\n" +
+	"\vexpressions\x18\x01 \x03(\v2\x10.calc.ExpressionR\vexpressions\"T\n" +
+	"\fTaskResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
+	"\n" +
+	"expression\x18\x02 \x01(\tR\n" +
+	"expression\x12\x14\n" +
+	"\x05error\x18\x03 \x01(\tR\x05error\";\n" +
+	"\x11TaskResultRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
+	"\x06result\x18\x02 \x01(\tR\x06result\"B\n" +
+	"\x12TaskSubmitResponse\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\x12\x14\n" +
+	"\x05error\x18\x02 \x01(\tR\x05error2\x8a\x03\n" +
+	"\vTaskService\x12D\n" +
+	"\rAddExpression\x12\x18.calc.CalculationRequest\x1a\x19.calc.CalculationResponse\x12;\n" +
+	"\x0eGetExpressions\x12\v.calc.Empty\x1a\x1c.calc.ExpressionListResponse\x12C\n" +
+	"\x11GetExpressionByID\x12\x14.calc.GetByIDRequest\x1a\x18.calc.CalculationRequest\x12@\n" +
+	"\tCalculate\x12\x18.calc.CalculationRequest\x1a\x19.calc.CalculationResponse\x12*\n" +
+	"\aGetTask\x12\v.calc.Empty\x1a\x12.calc.TaskResponse\x12E\n" +
+	"\x10SubmitTaskResult\x12\x17.calc.TaskResultRequest\x1a\x18.calc.TaskSubmitResponseB\bZ\x06/protob\x06proto3"
 
 var (
 	file_proto_task_proto_rawDescOnce sync.Once
@@ -145,19 +521,37 @@ func file_proto_task_proto_rawDescGZIP() []byte {
 	return file_proto_task_proto_rawDescData
 }
 
-var file_proto_task_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_proto_task_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_proto_task_proto_goTypes = []any{
-	(*TaskRequest)(nil), // 0: calc.TaskRequest
-	(*TaskResult)(nil),  // 1: calc.TaskResult
+	(*Empty)(nil),                  // 0: calc.Empty
+	(*CalculationRequest)(nil),     // 1: calc.CalculationRequest
+	(*CalculationResponse)(nil),    // 2: calc.CalculationResponse
+	(*Expression)(nil),             // 3: calc.Expression
+	(*GetByIDRequest)(nil),         // 4: calc.GetByIDRequest
+	(*ExpressionListResponse)(nil), // 5: calc.ExpressionListResponse
+	(*TaskResponse)(nil),           // 6: calc.TaskResponse
+	(*TaskResultRequest)(nil),      // 7: calc.TaskResultRequest
+	(*TaskSubmitResponse)(nil),     // 8: calc.TaskSubmitResponse
 }
 var file_proto_task_proto_depIdxs = []int32{
-	0, // 0: calc.TaskService.Calculate:input_type -> calc.TaskRequest
-	1, // 1: calc.TaskService.Calculate:output_type -> calc.TaskResult
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	3, // 0: calc.ExpressionListResponse.expressions:type_name -> calc.Expression
+	1, // 1: calc.TaskService.AddExpression:input_type -> calc.CalculationRequest
+	0, // 2: calc.TaskService.GetExpressions:input_type -> calc.Empty
+	4, // 3: calc.TaskService.GetExpressionByID:input_type -> calc.GetByIDRequest
+	1, // 4: calc.TaskService.Calculate:input_type -> calc.CalculationRequest
+	0, // 5: calc.TaskService.GetTask:input_type -> calc.Empty
+	7, // 6: calc.TaskService.SubmitTaskResult:input_type -> calc.TaskResultRequest
+	2, // 7: calc.TaskService.AddExpression:output_type -> calc.CalculationResponse
+	5, // 8: calc.TaskService.GetExpressions:output_type -> calc.ExpressionListResponse
+	1, // 9: calc.TaskService.GetExpressionByID:output_type -> calc.CalculationRequest
+	2, // 10: calc.TaskService.Calculate:output_type -> calc.CalculationResponse
+	6, // 11: calc.TaskService.GetTask:output_type -> calc.TaskResponse
+	8, // 12: calc.TaskService.SubmitTaskResult:output_type -> calc.TaskSubmitResponse
+	7, // [7:13] is the sub-list for method output_type
+	1, // [1:7] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_proto_task_proto_init() }
@@ -171,7 +565,7 @@ func file_proto_task_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_task_proto_rawDesc), len(file_proto_task_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

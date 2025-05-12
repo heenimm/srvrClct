@@ -19,14 +19,24 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TaskService_Calculate_FullMethodName = "/calc.TaskService/Calculate"
+	TaskService_AddExpression_FullMethodName     = "/calc.TaskService/AddExpression"
+	TaskService_GetExpressions_FullMethodName    = "/calc.TaskService/GetExpressions"
+	TaskService_GetExpressionByID_FullMethodName = "/calc.TaskService/GetExpressionByID"
+	TaskService_Calculate_FullMethodName         = "/calc.TaskService/Calculate"
+	TaskService_GetTask_FullMethodName           = "/calc.TaskService/GetTask"
+	TaskService_SubmitTaskResult_FullMethodName  = "/calc.TaskService/SubmitTaskResult"
 )
 
 // TaskServiceClient is the client API for TaskService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TaskServiceClient interface {
-	Calculate(ctx context.Context, in *TaskRequest, opts ...grpc.CallOption) (*TaskResult, error)
+	AddExpression(ctx context.Context, in *CalculationRequest, opts ...grpc.CallOption) (*CalculationResponse, error)
+	GetExpressions(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ExpressionListResponse, error)
+	GetExpressionByID(ctx context.Context, in *GetByIDRequest, opts ...grpc.CallOption) (*CalculationRequest, error)
+	Calculate(ctx context.Context, in *CalculationRequest, opts ...grpc.CallOption) (*CalculationResponse, error)
+	GetTask(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TaskResponse, error)
+	SubmitTaskResult(ctx context.Context, in *TaskResultRequest, opts ...grpc.CallOption) (*TaskSubmitResponse, error)
 }
 
 type taskServiceClient struct {
@@ -37,10 +47,60 @@ func NewTaskServiceClient(cc grpc.ClientConnInterface) TaskServiceClient {
 	return &taskServiceClient{cc}
 }
 
-func (c *taskServiceClient) Calculate(ctx context.Context, in *TaskRequest, opts ...grpc.CallOption) (*TaskResult, error) {
+func (c *taskServiceClient) AddExpression(ctx context.Context, in *CalculationRequest, opts ...grpc.CallOption) (*CalculationResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TaskResult)
+	out := new(CalculationResponse)
+	err := c.cc.Invoke(ctx, TaskService_AddExpression_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) GetExpressions(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ExpressionListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ExpressionListResponse)
+	err := c.cc.Invoke(ctx, TaskService_GetExpressions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) GetExpressionByID(ctx context.Context, in *GetByIDRequest, opts ...grpc.CallOption) (*CalculationRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CalculationRequest)
+	err := c.cc.Invoke(ctx, TaskService_GetExpressionByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) Calculate(ctx context.Context, in *CalculationRequest, opts ...grpc.CallOption) (*CalculationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CalculationResponse)
 	err := c.cc.Invoke(ctx, TaskService_Calculate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) GetTask(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*TaskResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TaskResponse)
+	err := c.cc.Invoke(ctx, TaskService_GetTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) SubmitTaskResult(ctx context.Context, in *TaskResultRequest, opts ...grpc.CallOption) (*TaskSubmitResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TaskSubmitResponse)
+	err := c.cc.Invoke(ctx, TaskService_SubmitTaskResult_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +111,12 @@ func (c *taskServiceClient) Calculate(ctx context.Context, in *TaskRequest, opts
 // All implementations must embed UnimplementedTaskServiceServer
 // for forward compatibility.
 type TaskServiceServer interface {
-	Calculate(context.Context, *TaskRequest) (*TaskResult, error)
+	AddExpression(context.Context, *CalculationRequest) (*CalculationResponse, error)
+	GetExpressions(context.Context, *Empty) (*ExpressionListResponse, error)
+	GetExpressionByID(context.Context, *GetByIDRequest) (*CalculationRequest, error)
+	Calculate(context.Context, *CalculationRequest) (*CalculationResponse, error)
+	GetTask(context.Context, *Empty) (*TaskResponse, error)
+	SubmitTaskResult(context.Context, *TaskResultRequest) (*TaskSubmitResponse, error)
 	mustEmbedUnimplementedTaskServiceServer()
 }
 
@@ -62,8 +127,23 @@ type TaskServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTaskServiceServer struct{}
 
-func (UnimplementedTaskServiceServer) Calculate(context.Context, *TaskRequest) (*TaskResult, error) {
+func (UnimplementedTaskServiceServer) AddExpression(context.Context, *CalculationRequest) (*CalculationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddExpression not implemented")
+}
+func (UnimplementedTaskServiceServer) GetExpressions(context.Context, *Empty) (*ExpressionListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetExpressions not implemented")
+}
+func (UnimplementedTaskServiceServer) GetExpressionByID(context.Context, *GetByIDRequest) (*CalculationRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetExpressionByID not implemented")
+}
+func (UnimplementedTaskServiceServer) Calculate(context.Context, *CalculationRequest) (*CalculationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Calculate not implemented")
+}
+func (UnimplementedTaskServiceServer) GetTask(context.Context, *Empty) (*TaskResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTask not implemented")
+}
+func (UnimplementedTaskServiceServer) SubmitTaskResult(context.Context, *TaskResultRequest) (*TaskSubmitResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SubmitTaskResult not implemented")
 }
 func (UnimplementedTaskServiceServer) mustEmbedUnimplementedTaskServiceServer() {}
 func (UnimplementedTaskServiceServer) testEmbeddedByValue()                     {}
@@ -86,8 +166,62 @@ func RegisterTaskServiceServer(s grpc.ServiceRegistrar, srv TaskServiceServer) {
 	s.RegisterService(&TaskService_ServiceDesc, srv)
 }
 
+func _TaskService_AddExpression_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CalculationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).AddExpression(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_AddExpression_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).AddExpression(ctx, req.(*CalculationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_GetExpressions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).GetExpressions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_GetExpressions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).GetExpressions(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_GetExpressionByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).GetExpressionByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_GetExpressionByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).GetExpressionByID(ctx, req.(*GetByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _TaskService_Calculate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TaskRequest)
+	in := new(CalculationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -99,7 +233,43 @@ func _TaskService_Calculate_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: TaskService_Calculate_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TaskServiceServer).Calculate(ctx, req.(*TaskRequest))
+		return srv.(TaskServiceServer).Calculate(ctx, req.(*CalculationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_GetTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).GetTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_GetTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).GetTask(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_SubmitTaskResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TaskResultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).SubmitTaskResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskService_SubmitTaskResult_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).SubmitTaskResult(ctx, req.(*TaskResultRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +282,28 @@ var TaskService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TaskServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "AddExpression",
+			Handler:    _TaskService_AddExpression_Handler,
+		},
+		{
+			MethodName: "GetExpressions",
+			Handler:    _TaskService_GetExpressions_Handler,
+		},
+		{
+			MethodName: "GetExpressionByID",
+			Handler:    _TaskService_GetExpressionByID_Handler,
+		},
+		{
 			MethodName: "Calculate",
 			Handler:    _TaskService_Calculate_Handler,
+		},
+		{
+			MethodName: "GetTask",
+			Handler:    _TaskService_GetTask_Handler,
+		},
+		{
+			MethodName: "SubmitTaskResult",
+			Handler:    _TaskService_SubmitTaskResult_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

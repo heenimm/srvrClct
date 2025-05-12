@@ -1,18 +1,56 @@
 syntax = "proto3";
 
-option go_package = "/proto";
-
 package calc;
 
+option go_package = "/proto";
+
 service TaskService {
-  rpc Calculate (TaskRequest) returns (TaskResult);
+  rpc AddExpression (CalculationRequest) returns (CalculationResponse);
+  rpc GetExpressions (Empty) returns (ExpressionListResponse);
+  rpc GetExpressionByID (GetByIDRequest) returns (CalculationRequest);
+  rpc Calculate (CalculationRequest) returns (CalculationResponse);
+  rpc GetTask (Empty) returns (TaskResponse);
+  rpc SubmitTaskResult (TaskResultRequest) returns (TaskSubmitResponse);
 }
 
-message TaskRequest {
+message Empty {}
+
+message CalculationRequest {
   string expression = 1;
 }
 
-message TaskResult {
-  string result = 1;
+message CalculationResponse {
+  string id = 1;
+  string result = 2;
+  string error = 3;
+}
+
+message Expression {
+  string id = 1;
+  string expression = 2;
+}
+
+message GetByIDRequest {
+  string id = 1;
+}
+
+
+message ExpressionListResponse {
+  repeated Expression expressions = 1;
+}
+
+message TaskResponse {
+  string id = 1;
+  string expression = 2;
+  string error = 3;
+}
+
+message TaskResultRequest {
+  string id = 1;
+  string result = 2;
+}
+
+message TaskSubmitResponse {
+  string status = 1;
   string error = 2;
 }

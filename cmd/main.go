@@ -15,7 +15,7 @@ func main() {
 	defer db.Close()
 
 	app := application.NewApplication(db)
-	app.RunServer()
+	go app.RunServer()
 	grpc.StartGRPCServer()
 
 }
