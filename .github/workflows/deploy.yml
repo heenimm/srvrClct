@@ -1,0 +1,40 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Позволяет запускать вручную через UI GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Build
+        run: go build -o bin/server ./cmd/main.go
+
+      - name: Run tests
+        run: go test ./...
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy to Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+          heroku container:login
+          heroku container:push web --app ${{ secrets.HEROKU_APP_NAME }}
+          heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
