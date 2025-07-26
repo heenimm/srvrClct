@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:  # Позволяет запускать вручную через UI GitHub
+  workflow_dispatch:
 
 jobs:
   build:
