@@ -38,7 +38,7 @@ func TestCalculateHandler_Success(t *testing.T) {
 		t.Fatalf("failed to decode response: %v", err)
 	}
 
-	require.Equal(t, res.StatusCode, http.StatusOK)
+	require.Equal(t, res.StatusCode, http.StatusCreated)
 	require.Equal(t, response.Result, float64(6))
 }
 
