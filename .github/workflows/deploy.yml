@@ -23,6 +23,35 @@ jobs:
       - name: Run tests
         run: go test ./...
 
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        env:
+          DB_HOST: postgres
+          DB_PORT: 5432
+          DB_USER: testuser
+          DB_PASS: testpass
+          DB_NAME: testdb
+        run: go test -v ./...
+
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
